@@ -16,6 +16,7 @@ window.onload = function() {
 
 function createPlayField(gridArr){
 	firstClick = false;
+	isMarkedCount=0;
 	gridArr = fillArrayByElems();
 	
 	var gameField = document.getElementById('game-field');

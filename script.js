@@ -1,22 +1,31 @@
 var gridArr;
-var bombArrInd;
 var gridDivArr;
 var isMarkedCount = 0;
 var BOMB_QUANT = 10;
 var FIELD_SIZE = 10;
 var OPENED_ELEM_COLOR = '#FCFCFC';
 var OPENED_NUM_ELEM_COLOR = '#CCCCCC';
-var LOOSE_STRING = 'You loose.Click to try again.';
-var WIN_STRING = 'You win! Click to play again!';
-var BOMB = "&#128163;";
+var LOOSE_STRING = 'BANG - game over! Click to try again.';
+var WIN_STRING = 'You won! Click to play again!';
+var TIME_STRING = '&#128336; 00';
+var BOMB_STRING = '&#128163;10';
+var BOMB = '✵';
+var SUSPECTED = '⚒';
 var firstClick = false;
+var timer;
+
 window.onload = function() {
 	createPlayField(gridArr);	
 }
 
 function createPlayField(gridArr){
 	firstClick = false;
-	isMarkedCount=0;
+	isMarkedCount= 0;
+
+	createField(document.body,'game-field',null,'div');
+	createField(document.body,'status-field-timer',TIME_STRING,'div');
+	createField(document.body,'status-field-bombs',BOMB_STRING,'div');
+
 	gridArr = fillArrayByElems();
 	
 	var gameField = document.getElementById('game-field');
@@ -24,14 +33,40 @@ function createPlayField(gridArr){
 		for (var j = 0; j < gridArr.length; j++) {
 			gridArr[i][j].makeDivGridElem(gameField,i,j);
 			gridArr[i][j].divElem.addEventListener("click", function(){
-				clickGridElem(this,gridArr);
+				leftClickElem(this,gridArr);
 			});
 			gridArr[i][j].divElem.addEventListener('contextmenu', function(ev) {
 				 ev.preventDefault();
 				 rightClickElem(this,gridArr);
 			});
 		}
-	}	
+	}
+
+	
+		
+}
+
+function startTimer(){
+	var timeCounter = 1;
+	timer = setInterval(function(){
+	var timeOutput;
+	if(String(timeCounter).length === 1){
+		timeOutput = '0' + timeCounter++;
+	}else{
+		timeOutput = timeCounter++;
+	}
+		document.getElementById('status-field-timer').innerHTML ='&#128336; ' + timeOutput;
+	},1000);
+};
+
+function markedCounterLeft(){
+	var bombOutput;
+	if (String(BOMB_QUANT - isMarkedCount).length != 2) {
+		bombOutput = '0' + (BOMB_QUANT - isMarkedCount);
+	}else{
+		bombOutput = BOMB_QUANT - isMarkedCount;
+	}
+	document.getElementById('status-field-bombs').innerHTML = '&#128163;' + bombOutput;
 }
 
 function rightClickElem(e,gridArr){
@@ -43,16 +78,17 @@ function rightClickElem(e,gridArr){
 			elem.isMarked = false;
 			isMarkedCount--;
 			elem.divElem.innerHTML ='';
-			//gridElemColorNumber(elem);
 		}else
 		if(elem.isMarked === false && 
 			isMarkedCount<BOMB_QUANT &&
 			elem.isCovered){
 			isMarkedCount++;
 			elem.isMarked = true;
-			elem.divElem.innerHTML ='✓';
+			elem.divElem.innerHTML =SUSPECTED;
 			elem.divElem.style.color = 'black';
 		}
+
+		markedCounterLeft();
 	}
 }
 
@@ -71,26 +107,30 @@ function checkWin(gridArr){
 			}
 		}
 	}
-	console.log(openedCount + " " + guessedCount);
+
+	//console.log(openedCount + " " + guessedCount);
 	if(openedCount === (FIELD_SIZE*FIELD_SIZE-BOMB_QUANT) ||
 		guessedCount === BOMB_QUANT){
 		gameOver(WIN_STRING);
 	}
 
 }
-function clickGridElem(e,gridArr){
+function leftClickElem(e,gridArr){
 	checkWin(gridArr);
 	
 	var elem = getClickedElem(e.id,gridArr);	
 	if(!firstClick){
 		setBombs(gridArr,elem.i,elem.j);
 		setNumbers(gridArr);
+		startTimer();
 		firstClick = true;
 	};
 
 	if(!elem.isMarked){
 		if(elem.hasBomb){		
 			elem.divElem.innerHTML = BOMB;
+			elem.divElem.style.background = 'red';
+			elem.divElem.style.fontSize='1.2em';
 			gameOver(LOOSE_STRING);
 		}else if(elem.bombsNear === 0){
 			openFreeGridElems(gridArr,elem.i,elem.j);
@@ -111,37 +151,35 @@ function getClickedElem(name,gridArr){
 }
 
 function gameOver(msg){
-	console.log('bang!');
+	clearInterval(timer);
 	var gameField = document.getElementById('game-field');
-	var endField = createField(gameField);
+	var statusFieldTimer = document.getElementById('status-field-timer');
+	var statusFieldBombs = document.getElementById('status-field-bombs');
+	var endField = createField(gameField,'game-field',null,'div');
 	endField.style.position = 'absolute';
-	var gameOver = createGameOverDiv(endField,msg);
-	gameOver.addEventListener("click", function(){
-				clearField(gameOver);
+
+	var gameOverBtn = createField(endField,'game-over',msg,'button');
+	gameOverBtn.addEventListener("click", function(){
+				clearField(gameOverBtn);
 				clearField(endField);
 				clearField(gameField);
-				createField(document.body);
+				clearField(statusFieldTimer);
+				clearField(statusFieldBombs);
 				createPlayField(gridArr);
 			});
 
 }
 
-function createGameOverDiv(parent,msg){
-	var gameOver = document.createElement('button');
-	gameOver.className = 'game-over';
-	gameOver.id = 'game-over';
-	gameOver.innerHTML = msg;
-	parent.appendChild(gameOver);
-	return gameOver;
-}
+function createField(parent,fieldName,msg,type){
+	var field = document.createElement(type);
+	field.className = fieldName;
+	field.id = fieldName;
+	if(msg){
+		field.innerHTML = msg;
+	}
+	parent.appendChild(field);
 
-function createField(parent){
-	var gameField = document.createElement('div');
-	gameField.className = 'game-field';
-	gameField.id = 'game-field';
-	parent.appendChild(gameField);
-
-	return gameField;
+	return field;
 }
 
 function clearField(gameField){
@@ -198,7 +236,7 @@ function setBombs(gridArr,i,j){
 			gridElem !== gridArr[i][j]){
 			gridElem.hasBomb = true;
 			bombCount++;
-			//gridElem.divElem.style.background ='red';//ckeckbomb
+			//gridElem.divElem.style.background ='red';//checkbomb
 		}
 	}
 }
@@ -220,10 +258,6 @@ function setNumbers(gridArr){
 
 			if(gridElem.hasBomb === false){		
 				gridElem.bombsNear = getBombsNear(i,j,gridArr);
-				
-				// if(gridElem.bombsNear !== 0){
-				// 	gridElemColorNumber(gridElem);
-				// }
 			}
 		}
 	}

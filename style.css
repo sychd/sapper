@@ -1,3 +1,14 @@
+body{
+	font-family: 'Trebuchet MS';
+	background-color: #f3f3f3;
+	text-align: center;
+}
+h3{
+	text-align: center;
+}
+h3 span{
+	color: #E91616;
+}
 
 .game-field{
 	width: 232px;
@@ -5,20 +16,35 @@
 	background-color: rgba(0,0,0,0.4);
 	position: relative;
 	margin: 0 auto;	
-	font-family: Helvetica;
 	font-weight: 700;
-	text-align: center;
+}
+.status-field-timer,
+.status-field-bombs{
+	width: 114px;
+	height: 12px;
+	line-height: 18px;
+	vertical-align: middle;
+	padding-top: 5px;
+	margin-right: 5px;
+	margin-top:10px;
+	display: inline-block;
+	text-align: left;
+	border-top: 1px solid #CCCCCC;
+}
+
+.status-field-bombs{
+	margin-right: 0;
+	text-align: right;
 }
 .grid-elem{
+	line-height: 21px;
 	text-align: center;
+	vertical-align: middle;
 	font-size: 0.9em;
-	font-family: Helvetica;
 	font-weight: 700;
-	padding-top: 2px;
 	-webkit-user-select: none;
-	width: 23px;
+	width: 21px;
 	height: 21px;
-	color:black;
 	border:2px solid rgba(17, 7, 17, 0.3);
 	position: absolute;
 	border-radius: 3px;
@@ -30,17 +56,19 @@
 }
 
 .game-over{
-	width: 100px;
+	width: 200px;
+	outline: none;
 	position: absolute;
-	/*border-radius: 5px;*/
+	border-radius: 18px;
+	border: none;
 	text-align: center;
 	padding: 10px;
 	font-family: Helvetica;
-	left: 68px;
+	left: 16px;
 	top: 80px;
 	-webkit-user-select: none;
 	cursor: pointer;
-	/*background:linear-gradient(to bottom, rgba(252,255,244,1) 0%,rgba(223,229,215,1) 40%,rgba(179,190,173,1) 100%);*/
+	background: linear-gradient(to bottom, rgba(249,252,247,1) 0%,rgba(245,249,240,1) 100%);
 }
 .game-over:active{
 	background: linear-gradient(to bottom, rgba(252,255,244,1) 0%,rgba(244,255,239,1) 40%,rgba(241,247,227,1) 100%);

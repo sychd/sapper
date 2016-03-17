@@ -1,4 +1,5 @@
 "use strict";
+
 var gridArr;
 var gridDivArr;
 var isMarkedCount = 0;
@@ -9,7 +10,9 @@ var OPENED_NUM_ELEM_COLOR = '#CCCCCC';
 var LOOSE_STRING = 'BANG - game over! Click to try again.';
 var WIN_STRING = 'You won! Click to play again!';
 var TIME_STRING = '&#128336; 00';
+var TIME_ICON = '&#128336;';
 var BOMB_STRING = '&#128163;10';
+var BOMB_ICON ='&#128163;';
 var BOMB = '✵';
 var SUSPECTED = '⚒';
 var firstClick = false;
@@ -19,9 +22,9 @@ window.onload = function() {
 	createPlayField(gridArr);	
 }
 
-function createPlayField(gridArr){
+function createPlayField(gridArr) {
 	firstClick = false;
-	isMarkedCount= 0;
+	isMarkedCount = 0;
 
 	createField(document.body,'game-field',null,'div');
 	createField(document.body,'status-field-timer',TIME_STRING,'div');
@@ -33,30 +36,31 @@ function createPlayField(gridArr){
 	for (var i = 0; i < gridArr.length; i++) {
 		for (var j = 0; j < gridArr.length; j++) {
 			gridArr[i][j].makeDivGridElem(gameField,i,j);
-			gridArr[i][j].divElem.addEventListener("click", function(){
-				leftClickElem(this,gridArr);
-			});
-			gridArr[i][j].divElem.addEventListener('contextmenu', function(ev) {
-				 ev.preventDefault();
-				 rightClickElem(this,gridArr);
-			});
+			initalizeNewItem(gridArr[i][j],gridArr);
 		}
-	}
-
-	
-		
+	}		
 }
 
-function startTimer(){
+function initalizeNewItem(gridElem, gridArr) {
+	gridElem.divElem.addEventListener("click", function(){
+		leftClickElem(this,gridArr);
+	});
+	gridElem.divElem.addEventListener('contextmenu', function(ev) {
+		 ev.preventDefault();
+		 rightClickElem(this,gridArr);
+	});
+}
+
+function startTimer() {
 	var timeCounter = 1;
-	timer = setInterval(function(){
-	var timeOutput;
-	if(String(timeCounter).length === 1){
-		timeOutput = '0' + timeCounter++;
-	}else{
-		timeOutput = timeCounter++;
-	}
-		document.getElementById('status-field-timer').innerHTML ='&#128336; ' + timeOutput;
+	timer = setInterval(function() {
+		var timeOutput;
+		if(String(timeCounter).length === 1) {
+			timeOutput = '0' + timeCounter++;
+		} else {
+			timeOutput = timeCounter++;
+		}
+			document.getElementById('status-field-timer').innerHTML = TIME_ICON +' ' + timeOutput;
 	},1000);
 };
 
@@ -64,10 +68,10 @@ function markedCounterLeft(){
 	var bombOutput;
 	if (String(BOMB_QUANT - isMarkedCount).length != 2) {
 		bombOutput = '0' + (BOMB_QUANT - isMarkedCount);
-	}else{
+	} else {
 		bombOutput = BOMB_QUANT - isMarkedCount;
 	}
-	document.getElementById('status-field-bombs').innerHTML = '&#128163;' + bombOutput;
+	document.getElementById('status-field-bombs').innerHTML = BOMB_ICON + bombOutput;
 }
 
 function rightClickElem(e,gridArr){
@@ -114,8 +118,8 @@ function checkWin(gridArr){
 		guessedCount === BOMB_QUANT){
 		gameOver(WIN_STRING);
 	}
-
 }
+
 function leftClickElem(e,gridArr){
 	checkWin(gridArr);
 	
@@ -284,36 +288,37 @@ function gridElemColorNumber(gridElem){
 function getBombsNear(i,j,gridArr){
 	var indI = 0,indJ = 0, bombs =0;
 	indI = i+1; indJ = j+1;
-	if(indI < FIELD_SIZE && indJ < FIELD_SIZE){
-		if(gridArr[indI][indJ].hasBomb){bombs++;}
+	if(indI < FIELD_SIZE && indJ < FIELD_SIZE && 
+									gridArr[indI][indJ].hasBomb){
+		bombs++;
 	}
 	indI = i-1; indJ = j-1;
-	if(indI >= 0 && indJ >= 0){
-		if(gridArr[indI][indJ].hasBomb){bombs++;}
+	if(indI >= 0 && indJ >= 0 && gridArr[indI][indJ].hasBomb){
+		bombs++;
 	}
 	indI = i-1; indJ = j+1;
-	if(indI >= 0 && indJ < FIELD_SIZE){
-		if(gridArr[indI][indJ].hasBomb){bombs++;}
+	if(indI >= 0 && indJ < FIELD_SIZE && gridArr[indI][indJ].hasBomb){
+		bombs++;
 	}
 	indI = i+1; indJ = j-1;
-	if(indI < FIELD_SIZE && indJ >= 0 ){
-		if(gridArr[indI][indJ].hasBomb){bombs++;}
+	if(indI < FIELD_SIZE && indJ >= 0 && gridArr[indI][indJ].hasBomb ){
+		bombs++;
 	}
 	indI = i; indJ = j+1;
-	if(indJ < FIELD_SIZE){
-		if(gridArr[indI][indJ].hasBomb){bombs++;}
+	if(indJ < FIELD_SIZE && gridArr[indI][indJ].hasBomb){
+		bombs++;
 	}
 	indI = i; indJ = j-1;
-	if(indJ >= 0){
-		if(gridArr[indI][indJ].hasBomb){bombs++;}
+	if(indJ >= 0 && gridArr[indI][indJ].hasBomb){
+		bombs++;
 	}
 	indI = i+1; indJ = j;
-	if(indI < FIELD_SIZE){
-		if(gridArr[indI][indJ].hasBomb){bombs++;}
+	if(indI < FIELD_SIZE && gridArr[indI][indJ].hasBomb){
+		bombs++;
 	}
 	indI = i-1; indJ = j;
-	if(indI >= 0){
-		if(gridArr[indI][indJ].hasBomb){bombs++;}
+	if(indI >= 0 && gridArr[indI][indJ].hasBomb){
+		bombs++;
 	}
 
 	return bombs;

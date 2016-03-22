@@ -193,10 +193,15 @@ function clearField(gameField){
 
 function openFreeGridElems(gridArr,i,j){
 	i = Number(i);	j = Number(j);
-	if(gridArr[i][j].bombsNear !== 0 || 
+	if( 
 		gridArr[i][j].hasBomb ||
 		!gridArr[i][j].isCovered ||
 		gridArr[i][j].isMarked){
+		return;
+	}
+
+	if(gridArr[i][j].bombsNear !== 0){//fix
+		gridArr[i][j].divElem.click();	
 		return;
 	}
 
